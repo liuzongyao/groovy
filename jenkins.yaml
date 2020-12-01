@@ -1,0 +1,427 @@
+credentials:
+  system:
+    domainCredentials:
+    - credentials:
+      - gitlabPersonalAccessToken:
+          id: "A5ZTFY3z"
+          scope: SYSTEM
+          token: "{AQAAABAAAAAgCpNrTbVVNeNlJ2h4vkVX7XQysTcT8TFIn1Jml3yp1FVrT9THvn6itrFKRQLd2Hl8}"
+      - string:
+          description: "Token auto-injected by DevOps Controller for Jenkins Operator"
+          id: "jenkins-operator-token"
+          scope: GLOBAL
+          secret: "{AQAAABAAAAPAPzuBdCawHm98knVBl7z9Ww42Rue0rQKQbgZfKdT3fTJ1ReFfUm8KFhYwhWrfbyp1x+aj5i/M7YnIo0WvP/JlAi2H1goXjCDl3s2n02uh2PSOjn2rck2ojodVEKDvnol2tI3EZfxHKy2cFJ8CMapllF2X19cUDikDIwCTL4iOOokT6HDaJySo9jaN0crqhkaXcDWRjUnThnR8yfGC/CaoY2zeoVBPJZtr0pgs9Q0JwKkecRZ9zlHMOBYjV3DteWq+d0Q087O8L9Mn913nYE0R3hi8LL8IMAHjFADdCk4J/aEL9dhHaUC/VLKsz2j4M3hLYFVk7Ie3ug8pVgbi/5M/pEMU7XZXmSGQMC9b9JMlC/kVb67EjDlRW0O9V3ecsavoHhfkCML74px5W+PisMBcNZxYKVyLY725RIJv6d0HmuvfxnFQuwg+fZO0SX+T/RkStz5iUFKEJmU80rF6LaFXmj+xSZTpKzMgAHhsExfAUf2la3PQ68jSPVljFP65MADlIvLq96HvyascTRUljqBN6/3btpc5CHP0cgbyvKWmsk8lKnmhYy18DBz2An3RrMEPRl2Y3+H6bhWv65jRGTi441TO3GfIVRi1y5tyGOuX8OUxbDcQP7V/RcNbomCTvwqw53IKh7UEOXl6yL584rjnTDdBIicMRJq1Rz1qoSHpPE7XXNc6eClhZNM0wH0KCeNuAQ7napG//zCsCFwQwunH8SeYPbLlXnKrkX8caEkwpSSPFY27NwUJ/UEC1TmdiMbdS6J427HLtB2t0ZuqBH3I9sJv8Dd4CT9e3Qm2rNqZqbO/OMymjT/xCBhwOqsxcEIsqR5VMIDFkDPTVsbrBeJhrMMkOgU88VlcaDmphy35CzLHHsm5GpzViFQY4+sIYxvDXQ9exBshJIFn07DOB8TKH71BtCioF+wSQnXuX9hCiwnK+UPUIqMA21pW25ojJynxsGlQEv0Q8a8KfljRbyuexIpH/kAoOnhpnFyQFV5fI44AfXqCuhOz7jqGyyNNIAwmWK4JBzlIJhtKKTE98+HYKXL4IbQWQDveGAdeKnzc9xWO7nthFb6OFcEsWS0jV7TNMlUk+txugqBC9Mz4VH4/JrvjGLw7QJXG4+87VafHKXF5Z6XCbJryPqzjme8zg0DYI+3ksXyHLHl5H/F9oG+mBUB6xUn9AHM9ZSnDRULUmhdm9eGX9oHfzbo0ep6NCNWa42ekMwweFFgkQWYr1a5pxFZQK/L6/pdGR1cLCf53M+cbLzE3C5R6DhNIwM6KxoKYrNoHDirCwTKxwCkf4Ovouw==}"
+jenkins:
+  agentProtocols:
+  - "JNLP4-connect"
+  - "Ping"
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+  clouds:
+  - kubernetes:
+      jenkinsTunnel: "jenkins-local-chart-jenkins-agent.default:50000"
+      jenkinsUrl: "http://jenkins-local-chart-jenkins.default:8080"
+      maxRequestsPerHostStr: "32"
+      name: "kubernetes"
+      namespace: "default"
+      serverUrl: "https://kubernetes.default"
+      templates:
+      - containers:
+        - args: "^${computer.jnlpmac} ^${computer.name}"
+          image: "192.168.17.1:60080/devops/jnlp-slave:4.0.1-1-jdk11-v3.0.20.20"
+          livenessProbe:
+            failureThreshold: 0
+            initialDelaySeconds: 0
+            periodSeconds: 0
+            successThreshold: 0
+            timeoutSeconds: 0
+          name: "jnlp"
+          resourceLimitCpu: "500m"
+          resourceLimitMemory: "512Mi"
+          resourceRequestCpu: "200m"
+          resourceRequestMemory: "256Mi"
+          workingDir: "/home/jenkins/agent"
+        - args: "cat"
+          command: "/bin/sh -c"
+          image: "192.168.17.1:60080/devops/builder-tools:ubuntu-v3.0.1"
+          livenessProbe:
+            failureThreshold: 0
+            initialDelaySeconds: 0
+            periodSeconds: 0
+            successThreshold: 0
+            timeoutSeconds: 0
+          name: "tools"
+          resourceLimitCpu: "500m"
+          resourceLimitMemory: "1G"
+          resourceRequestCpu: "200m"
+          resourceRequestMemory: "512Mi"
+          ttyEnabled: true
+          workingDir: "/home/jenkins/agent"
+        envVars:
+        - envVar:
+            key: "JENKINS_URL"
+            value: "http://jenkins-local-chart-jenkins.default:8080"
+        hostNetwork: false
+        instanceCap: 10
+        instanceCapStr: "10"
+        label: "tools base"
+        name: "base"
+        nodeUsageMode: NORMAL
+        podRetention: "never"
+        serviceAccount: "jenkins-local-chart-jenkins"
+        volumes:
+        - hostPathVolume:
+            hostPath: "/var/run/docker.sock"
+            mountPath: "/var/run/docker.sock"
+        - emptyDirVolume:
+            memory: false
+            mountPath: "/tmp"
+        yamlMergeStrategy: "override"
+      - containers:
+        - args: "cat"
+          command: "/bin/sh -c"
+          image: "192.168.17.1:60080/devops/builder-java:openjdk8-v3.0.2"
+          livenessProbe:
+            failureThreshold: 0
+            initialDelaySeconds: 0
+            periodSeconds: 0
+            successThreshold: 0
+            timeoutSeconds: 0
+          name: "java"
+          resourceLimitCpu: "1"
+          resourceLimitMemory: "2500M"
+          resourceRequestCpu: "500m"
+          resourceRequestMemory: "750M"
+          ttyEnabled: true
+          workingDir: "/home/jenkins/agent"
+        hostNetwork: false
+        inheritFrom: "base"
+        instanceCap: 10
+        instanceCapStr: "10"
+        label: "java java-openjdk8 maven maven3.5"
+        name: "java"
+        nodeUsageMode: NORMAL
+        podRetention: "never"
+        yamlMergeStrategy: "override"
+      - containers:
+        - args: "cat"
+          command: "/bin/sh -c"
+          image: "192.168.17.1:60080/devops/builder-go:1.12-ubuntu-v2.13-2-g0cef734"
+          livenessProbe:
+            failureThreshold: 0
+            initialDelaySeconds: 0
+            periodSeconds: 0
+            successThreshold: 0
+            timeoutSeconds: 0
+          name: "golang"
+          resourceLimitCpu: "1"
+          resourceLimitMemory: "1500M"
+          resourceRequestCpu: "500m"
+          resourceRequestMemory: "750M"
+          ttyEnabled: true
+          workingDir: "/home/jenkins/agent"
+        hostNetwork: false
+        inheritFrom: "base"
+        instanceCap: 10
+        instanceCapStr: "10"
+        label: "go golang golang-1.12"
+        name: "golang1.12"
+        nodeUsageMode: NORMAL
+        podRetention: "never"
+        yamlMergeStrategy: "override"
+      - containers:
+        - args: "cat"
+          command: "/bin/sh -c"
+          image: "192.168.17.1:60080/devops/builder-go:1.13-ubuntu-v3.0.0"
+          livenessProbe:
+            failureThreshold: 0
+            initialDelaySeconds: 0
+            periodSeconds: 0
+            successThreshold: 0
+            timeoutSeconds: 0
+          name: "golang"
+          resourceLimitCpu: "1"
+          resourceLimitMemory: "1500M"
+          resourceRequestCpu: "500m"
+          resourceRequestMemory: "750M"
+          ttyEnabled: true
+          workingDir: "/home/jenkins/agent"
+        hostNetwork: false
+        inheritFrom: "base"
+        instanceCap: 10
+        instanceCapStr: "10"
+        label: "go golang golang-1.13"
+        name: "golang1.13"
+        nodeUsageMode: NORMAL
+        podRetention: "never"
+        yamlMergeStrategy: "override"
+      - containers:
+        - args: "cat"
+          command: "/bin/sh -c"
+          image: "192.168.17.1:60080/devops/builder-go:1.14-ubuntu-v3.0.0"
+          livenessProbe:
+            failureThreshold: 0
+            initialDelaySeconds: 0
+            periodSeconds: 0
+            successThreshold: 0
+            timeoutSeconds: 0
+          name: "golang"
+          resourceLimitCpu: "1"
+          resourceLimitMemory: "1500M"
+          resourceRequestCpu: "500m"
+          resourceRequestMemory: "750M"
+          ttyEnabled: true
+          workingDir: "/home/jenkins/agent"
+        hostNetwork: false
+        inheritFrom: "base"
+        instanceCap: 10
+        instanceCapStr: "10"
+        label: "go golang golang-1.14 golang-latest"
+        name: "golang1.14"
+        nodeUsageMode: NORMAL
+        podRetention: "never"
+        yamlMergeStrategy: "override"
+      - containers:
+        - args: "cat"
+          command: "/bin/sh -c"
+          image: "192.168.17.1:60080/devops/builder-nodejs:10-stretch-v3.0.2"
+          livenessProbe:
+            failureThreshold: 0
+            initialDelaySeconds: 0
+            periodSeconds: 0
+            successThreshold: 0
+            timeoutSeconds: 0
+          name: "nodejs"
+          resourceLimitCpu: "1"
+          resourceLimitMemory: "1500M"
+          resourceRequestCpu: "500m"
+          resourceRequestMemory: "750M"
+          ttyEnabled: true
+          workingDir: "/home/jenkins/agent"
+        hostNetwork: false
+        inheritFrom: "base"
+        instanceCap: 10
+        instanceCapStr: "10"
+        label: "node nodejs nodejs-10"
+        name: "nodejs"
+        nodeUsageMode: NORMAL
+        podRetention: "never"
+        yamlMergeStrategy: "override"
+      - containers:
+        - args: "cat"
+          command: "/bin/sh -c"
+          image: "192.168.17.1:60080/devops/builder-nodejs:12-stretch-v3.0.2"
+          livenessProbe:
+            failureThreshold: 0
+            initialDelaySeconds: 0
+            periodSeconds: 0
+            successThreshold: 0
+            timeoutSeconds: 0
+          name: "nodejs"
+          resourceLimitCpu: "1"
+          resourceLimitMemory: "1500M"
+          resourceRequestCpu: "500m"
+          resourceRequestMemory: "750M"
+          ttyEnabled: true
+          workingDir: "/home/jenkins/agent"
+        hostNetwork: false
+        inheritFrom: "base"
+        instanceCap: 10
+        instanceCapStr: "10"
+        label: "node nodejs nodejs-12 node-stretch"
+        name: "nodejs12"
+        nodeUsageMode: NORMAL
+        podRetention: "never"
+        yamlMergeStrategy: "override"
+      - containers:
+        - args: "cat"
+          command: "/bin/sh -c"
+          image: "192.168.17.1:60080/devops/builder-python:2.7-v3.0.0"
+          livenessProbe:
+            failureThreshold: 0
+            initialDelaySeconds: 0
+            periodSeconds: 0
+            successThreshold: 0
+            timeoutSeconds: 0
+          name: "python"
+          resourceLimitCpu: "1"
+          resourceLimitMemory: "1500M"
+          resourceRequestCpu: "500m"
+          resourceRequestMemory: "750M"
+          ttyEnabled: true
+          workingDir: "/home/jenkins/agent"
+        hostNetwork: false
+        inheritFrom: "base"
+        instanceCap: 10
+        instanceCapStr: "10"
+        label: "python python-2.7"
+        name: "python2.7"
+        nodeUsageMode: NORMAL
+        podRetention: "never"
+        yamlMergeStrategy: "override"
+      - containers:
+        - args: "cat"
+          command: "/bin/sh -c"
+          image: "192.168.17.1:60080/devops/builder-python:3.6-v3.0.0"
+          livenessProbe:
+            failureThreshold: 0
+            initialDelaySeconds: 0
+            periodSeconds: 0
+            successThreshold: 0
+            timeoutSeconds: 0
+          name: "python"
+          resourceLimitCpu: "1"
+          resourceLimitMemory: "1500M"
+          resourceRequestCpu: "500m"
+          resourceRequestMemory: "750M"
+          ttyEnabled: true
+          workingDir: "/home/jenkins/agent"
+        hostNetwork: false
+        inheritFrom: "base"
+        instanceCap: 10
+        instanceCapStr: "10"
+        label: "python python-3.6"
+        name: "python3.6"
+        nodeUsageMode: NORMAL
+        podRetention: "never"
+        yamlMergeStrategy: "override"
+      - containers:
+        - args: "cat"
+          command: "/bin/sh -c"
+          image: "192.168.17.1:60080/devops/builder-python:3.7-v3.0.0"
+          livenessProbe:
+            failureThreshold: 0
+            initialDelaySeconds: 0
+            periodSeconds: 0
+            successThreshold: 0
+            timeoutSeconds: 0
+          name: "python"
+          resourceLimitCpu: "1"
+          resourceLimitMemory: "1500M"
+          resourceRequestCpu: "500m"
+          resourceRequestMemory: "750M"
+          ttyEnabled: true
+          workingDir: "/home/jenkins/agent"
+        hostNetwork: false
+        inheritFrom: "base"
+        instanceCap: 10
+        instanceCapStr: "10"
+        label: "python python-3.7"
+        name: "python3.7"
+        nodeUsageMode: NORMAL
+        podRetention: "never"
+        yamlMergeStrategy: "override"
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: true
+  disableRememberMe: false
+  labelString: "master"
+  markupFormatter: "plainText"
+  mode: NORMAL
+  myViewsTabBar: "standard"
+  numExecutors: 0
+  primaryView:
+    all:
+      name: "all"
+  projectNamingStrategy: "standard"
+  quietPeriod: 5
+  remotingSecurity:
+    enabled: true
+  scmCheckoutRetryCount: 0
+  securityRealm: "legacy"
+  slaveAgentPort: 50000
+  updateCenter:
+    sites:
+    - id: "default"
+      url: "https://updates.jenkins.io/update-center.json"
+  views:
+  - all:
+      name: "all"
+  viewsTabBar: "standard"
+security:
+  apiToken:
+    creationOfLegacyTokenEnabled: false
+    tokenGenerationOnCreationEnabled: false
+    usageStatisticsEnabled: true
+  copyartifact:
+    mode: PRODUCTION
+  sSHD:
+    port: -1
+unclassified:
+  badgePlugin:
+    disableFormatHTML: false
+  bitbucketEndpointConfiguration:
+    endpoints:
+    - bitbucketCloudEndpoint:
+        enableCache: false
+        manageHooks: false
+        repositoriesCacheDuration: 0
+        teamCacheDuration: 0
+  defaultFolderConfiguration:
+    healthMetrics:
+    - worstChildHealthMetric:
+        recursive: true
+  gitHubConfiguration:
+    apiRateLimitChecker: ThrottleForNormalize
+  gitHubPluginConfig:
+    hookUrl: "http://192.168.17.24:30300/github-webhook/"
+  gitLabServers:
+    servers:
+    - credentialsId: "A5ZTFY3z"
+      manageWebHooks: true
+      name: "local-ares-gitlabtool"
+      serverUrl: "http://192.168.17.14:31101"
+  gitSCM:
+    createAccountBasedOnEmail: false
+    showEntireCommitSummaryInChanges: false
+    useExistingAccountWithSameEmail: false
+  giteeConnectionConfig:
+    connections:
+    - clientBuilderId: "v5"
+      connectionTimeout: 10
+      ignoreCertificateErrors: false
+      readTimeout: 10
+  globalLibraries:
+    libraries:
+    - defaultVersion: "master"
+      name: "zongyao"
+      retriever:
+        modernSCM:
+          scm:
+            git:
+              id: "cefc0c34-6e4b-4421-8b58-0607d89c93e1"
+              remote: "https://github.com/liuzongyao/groovy.git"
+              traits:
+              - "gitBranchDiscovery"
+  location:
+    adminAddress: "没有配置邮箱地址 <nobody@nowhere>"
+    url: "http://192.168.17.24:30300/"
+  mailer:
+    charset: "UTF-8"
+    useSsl: false
+    useTls: false
+  pollSCM:
+    pollingThreadCount: 10
+  prometheusConfiguration:
+    collectingMetricsPeriodInSeconds: 120
+    countAbortedBuilds: true
+    countFailedBuilds: true
+    countNotBuiltBuilds: true
+    countSuccessfulBuilds: true
+    countUnstableBuilds: true
+    defaultNamespace: "default"
+    fetchTestResults: true
+    jobAttributeName: "jenkins_job"
+    path: "prometheus"
+    processingDisabledBuilds: false
+    useAuthenticatedEndpoint: false
+  sonarGlobalConfiguration:
+    buildWrapperEnabled: false
+  upstream:
+    globalUpstreamFilterStrategy: UseOldest
+tool:
+  git:
+    installations:
+    - home: "git"
+      name: "Default"
